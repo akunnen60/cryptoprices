@@ -1,5 +1,5 @@
 const cryptos = [
-    { symbol: "BTC", feed: "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd" },
+    { symbol: "BTC", feed: "https://api.coingecko.com/api/v3/simple/price?symbol=BTC&vs_currencies=usd" },
     { symbol: "ETH", feed: "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd" },
     { symbol: "XRP", feed: "https://api.coingecko.com/api/v3/simple/price?ids=ripple&vs_currencies=usd" },
     { symbol: "SOL", feed: "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd" },
@@ -18,7 +18,7 @@ async function fetchCryptoPrices() {
         }
     } catch (error) {
         console.error("Erreur lors de la récupération des prix :", error);
-        prices.push("Erreur de chargement des prix.");
+        prices.push("Prix des crypto-monnaies indisponibles sur coingecko!");
     }
     updateBanner(prices.join(" &nbsp; | &nbsp; "));
 }
