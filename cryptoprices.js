@@ -33,6 +33,6 @@ function updateBanner(content) {
     banner.style.animation = "scroll 15s linear infinite";
 }
 
-// Charger les prix au démarrage et toutes les 30 secondes
+// Charger les prix au démarrage et toutes les 10 secondes
 fetchCryptoPrices();
-setInterval(fetchCryptoPrices, 30000);
+setInterval(fetchCryptoPrices, 10000);
