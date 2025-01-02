@@ -7,14 +7,13 @@
     <style>
         #crypto-banner {
             background: #FBFAF3;
-            color: #111111;
+            color: #fff;
             padding: 10px;
             font-size: 18px;
             font-weight: bold;
             overflow: hidden;
             white-space: nowrap;
             text-align: center;
-            position: relative;
         }
         body {
             font-family: Arial, sans-serif;
@@ -39,7 +38,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         h1, h2 {
-            color: #111111;
+            color: #4CAF50;
         }
         button {
             background-color: #4CAF50;
@@ -54,6 +53,16 @@
         button:hover {
             background-color: #45a049;
         }
+        .code-display {
+            background: #000;
+            color: #fff;
+            padding: 10px;
+            font-size: 18px;
+            margin-top: 10px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
         footer {
             text-align: center;
             margin-top: 20px;
@@ -61,20 +70,11 @@
             background: #333;
             color: #fff;
         }
-        @keyframes scroll {
-            0% {
-                transform: translateX(100%);
-            }
-            100% {
-                transform: translateX(-100%);
-            }
-        }
     </style>
 </head>
 <body>
     <div id="crypto-banner">Chargement des prix des cryptos...</div>
-    <script src="cryptoprices.js"></script> <!-- Appel au script externe -->
-
+    <script src="cryptoprices.js"></script>
     <header>
         <h1>Démo : Sécuriser une transaction avec Chainlink et Blockchain</h1>
     </header>
@@ -111,10 +111,39 @@
             <li><strong>Blockchain publique :</strong> Inscription des transactions sur une blockchain comme Polygon ou Ethereum.</li>
             <li><strong>AWS :</strong> Hébergement sécurisé de cette démonstration en ligne.</li>
         </ul>
+
+        <h2>Commencez la démonstration</h2>
+        <p>
+            Cliquez sur le bouton ci-dessous pour générer un code sécurisé et voir comment il est inscrit sur la blockchain !
+        </p>
+        <button onclick="generateRandomCode()">Générer un code</button>
+        <div id="code-display" class="code-display">Votre code généré apparaîtra ici...</div>
     </div>
 
     <footer>
         <p>© 2025 - Démonstration de la blockchain et de Chainlink</p>
     </footer>
+
+    <script>
+        async function generateRandomCode() {
+            const display = document.getElementById('code-display');
+            display.style.display = 'block';
+            display.textContent = 'Génération en cours...';
+
+            try {
+                // Simulation d'une requête à Chainlink VRF
+                const randomCode = Math.floor(Math.random() * 1_000_000_000).toString().padStart(9, '0');
+                display.textContent = `Code généré : ${randomCode}`;
+
+                // Simuler une transaction blockchain
+                setTimeout(() => {
+                    display.textContent += '\nTransaction enregistrée sur la blockchain !';
+                }, 2000);
+            } catch (error) {
+                display.textContent = 'Erreur lors de la génération du code. Veuillez réessayer.';
+                console.error('Erreur :', error);
+            }
+        }
+    </script>    
 </body>
 </html>
