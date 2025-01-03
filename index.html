@@ -90,11 +90,34 @@
         <h1>Démo : Sécuriser une transaction avec Chainlink et Blockchain</h1>
     </header>
     <div class="container">
+        <!-- Introduction -->
+        <h2>Introduction</h2>
+        <p>
+            Découvrez comment utiliser la puissance de la blockchain et de Chainlink VRF pour
+            sécuriser des transactions de manière immuable et transparente.
+        </p>
+
+        <!-- Objectifs de la démonstration -->
+        <h2>Objectifs de la démonstration</h2>
+        <ol>
+            <li><strong>Génération d’un code aléatoire sécurisé :</strong> Utilisation de Chainlink VRF pour créer un code unique et vérifiable.</li>
+            <li><strong>Création d’une transaction immuable :</strong> Le code est inscrit sur une blockchain publique, garantissant transparence et intégrité.</li>
+            <li><strong>Démonstration pratique :</strong> Explorez un cas réel d'application de ces technologies.</li>
+        </ol>
+
         <!-- Étape 1 : Générer un code unique avec Chainlink VRF -->
         <h2>Étape 1 : Générer un code unique</h2>
         <p>
             Utilisez Chainlink VRF pour générer un code aléatoire sécurisé et vérifiable. Ce code sera utilisé pour identifier de manière unique votre transaction.
         </p>
+        <p>
+            <strong>Pourquoi utiliser Chainlink VRF ?</strong> Chainlink VRF (Verifiable Random Function) est une solution décentralisée pour générer des nombres aléatoires vérifiables. Contrairement à un générateur aléatoire classique, Chainlink VRF fournit une preuve cryptographique que le nombre généré est vraiment aléatoire et n'a pas été manipulé. Cela garantit :
+        </p>
+        <ul>
+            <li><strong>Transparence :</strong> Le processus de génération est enregistré sur la blockchain et peut être vérifié par n'importe qui.</li>
+            <li><strong>Sécurité :</strong> Le nombre aléatoire est protégé contre toute manipulation grâce à des techniques cryptographiques avancées.</li>
+            <li><strong>Décentralisation :</strong> Aucune entité centrale ne contrôle la génération du nombre, ce qui renforce la confiance.</li>
+        </ul>
         <button onclick="generateRandomCode()">Générer un code</button>
         <div id="code-display" class="code-display">Votre code généré apparaîtra ici...</div>
 
@@ -123,6 +146,21 @@
         </p>
         <button onclick="showTransactionLink()">Voir la transaction</button>
         <div id="transaction-link" style="margin-top: 20px;"></div>
+
+        <!-- Pourquoi ce projet est important ? -->
+        <h2>Pourquoi ce projet est important ?</h2>
+        <p>
+            La blockchain offre une solution pour sécuriser les transactions, garantir leur immuabilité, et créer des systèmes transparents. 
+            Ce projet démontre comment combiner les technologies de Chainlink et des blockchains pour répondre à des besoins variés.
+        </p>
+
+        <!-- Technologies utilisées -->
+        <h2>Technologies utilisées</h2>
+        <ul>
+            <li><strong>Chainlink VRF :</strong> Génération de codes aléatoires sécurisés et vérifiables.</li>
+            <li><strong>Blockchain publique :</strong> Inscription des transactions sur une blockchain comme Polygon ou Ethereum.</li>
+            <li><strong>AWS :</strong> Hébergement sécurisé de cette démonstration en ligne.</li>
+        </ul>
     </div>
 
     <footer>
