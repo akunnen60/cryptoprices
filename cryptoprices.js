@@ -8,7 +8,10 @@ const cryptos = [
     { symbol: "TRX", id: "tron", fallbackId: "TRX" }, // TRON
     { symbol: "AVAX", id: "avalanche-2", fallbackId: "AVAX" }, // Avalanche
     { symbol: "DOGE", id: "dogecoin", fallbackId: "DOGE" }, // Dogecoin
-    { symbol: "LINK", id: "chainlink", fallbackId: "LINK" } // Chainlink
+    { symbol: "LINK", id: "chainlink", fallbackId: "LINK" }, // Chainlink
+    { symbol: "SUI", id: "sui", fallbackId: "SUI" }, // Ajout de SUI
+    { symbol: "SHIB", id: "shiba-inu", fallbackId: "SHIB" }, // Ajout de Shiba Inu
+    { symbol: "XLM", id: "stellar", fallbackId: "XLM" } // Ajout de Stellar (XLM)
 ];
 
 // Fonction pour récupérer les prix via CoinGecko
@@ -82,7 +85,7 @@ function updateBanner(content) {
         // Calculer la durée de l'animation en fonction de la longueur du texte
         const textWidth = banner.scrollWidth / 2; // Largeur du texte (divisé par 2 car on l'a répété)
         const bannerWidth = banner.clientWidth; // Largeur visible de la bannière
-        const duration = (textWidth / bannerWidth) * 15; // Ajuster la durée (15s par défaut)
+        const duration = (textWidth / bannerWidth) * 30; // Ajuster la durée (15s par défaut)
 
         // Appliquer la nouvelle durée
         banner.style.animation = `scroll ${duration}s linear infinite`;
