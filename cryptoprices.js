@@ -77,7 +77,7 @@ function updateBanner(content) {
     const banner = document.getElementById("crypto-banner");
     if (banner) {
         // Répéter le texte pour créer un effet de boucle fluide
-        banner.innerHTML = content + " &nbsp; | &nbsp; " + content;
+        banner.innerHTML = content + " (10 refresh) ";
 
         // Calculer la durée de l'animation en fonction de la longueur du texte
         const textWidth = banner.scrollWidth / 2; // Largeur du texte (divisé par 2 car on l'a répété)
