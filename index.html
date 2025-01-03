@@ -15,7 +15,7 @@
             font-size: 16px;
             color: #333;
             position: relative; /* Pour que l'animation fonctionne correctement */
-            animation: scroll 50s linear infinite; /* Défilement lent */
+            animation: scroll 80s linear infinite; /* Défilement lent */
         }
         body {
             font-family: Arial, sans-serif;
@@ -85,12 +85,14 @@
         <h1>Démo : Sécuriser une transaction avec Chainlink et Blockchain</h1>
     </header>
     <div class="container">
+        <!-- Introduction -->
         <h2>Introduction</h2>
         <p>
             Découvrez comment utiliser la puissance de la blockchain et de Chainlink VRF pour
             sécuriser des transactions de manière immuable et transparente.
         </p>
 
+        <!-- Objectifs de la démonstration -->
         <h2>Objectifs de la démonstration</h2>
         <ol>
             <li><strong>Génération d’un code aléatoire sécurisé :</strong> Utilisation de Chainlink VRF pour créer un code unique et vérifiable.</li>
@@ -98,39 +100,66 @@
             <li><strong>Démonstration pratique :</strong> Explorez un cas réel d'application de ces technologies.</li>
         </ol>
 
-        <h2>Étapes de la démonstration</h2>
-        <ul>
-            <li><strong>Génération du code :</strong> Cliquez sur le bouton ci-dessous pour générer un code aléatoire unique.</li>
-            <li><strong>Création de la transaction :</strong> Une transaction contenant le code sera enregistrée sur une blockchain publique.</li>
-            <li><strong>Validation :</strong> Consultez la transaction sur un explorateur blockchain public.</li>
-        </ul>
+        <!-- Étape 1 : Générer un code unique avec Chainlink VRF -->
+        <h2>Étape 1 : Générer un code unique</h2>
+        <p>
+            Utilisez Chainlink VRF pour générer un code aléatoire sécurisé et vérifiable. Ce code sera utilisé pour identifier de manière unique votre transaction.
+        </p>
+        <button onclick="generateRandomCode()">Générer un code</button>
+        <div id="code-display" class="code-display">Votre code généré apparaîtra ici...</div>
 
+        <!-- Étape 2 : Demander un code et un commentaire -->
+        <h2>Étape 2 : Entrer un code et un commentaire</h2>
+        <p>
+            Entrez le code généré et un commentaire pour créer une transaction. Ces informations seront enregistrées sur la blockchain.
+        </p>
+        <button onclick="openInputModal()">Entrer le code et le commentaire</button>
+
+        <!-- Étape 3 : Écrire une transaction sur la blockchain -->
+        <h2>Étape 3 : Écrire une transaction sur la blockchain</h2>
+        <p>
+            Enregistrez le code et le commentaire sur la blockchain BDAG (testnet). Cette étape garantit l'immuabilité et la transparence de la transaction.
+        </p>
+        <button onclick="writeToBlockchain()">Écrire sur la blockchain</button>
+
+        <!-- Étape 4 : Afficher un lien vers BDAG Scan -->
+        <h2>Étape 4 : Voir la transaction sur BDAG Scan</h2>
+        <p>
+            Consultez la transaction enregistrée sur BDAG Scan. Vous pouvez vérifier les détails de la transaction, y compris le code et le commentaire.
+        </p>
+        <button onclick="showTransactionLink()">Voir la transaction</button>
+        <div id="transaction-link" style="margin-top: 20px;"></div>
+
+        <!-- Pourquoi ce projet est important ? -->
         <h2>Pourquoi ce projet est important ?</h2>
         <p>
             La blockchain offre une solution pour sécuriser les transactions, garantir leur immuabilité, et créer des systèmes transparents. 
             Ce projet démontre comment combiner les technologies de Chainlink et des blockchains pour répondre à des besoins variés.
         </p>
 
+        <!-- Technologies utilisées -->
         <h2>Technologies utilisées</h2>
         <ul>
             <li><strong>Chainlink VRF :</strong> Génération de codes aléatoires sécurisés et vérifiables.</li>
             <li><strong>Blockchain publique :</strong> Inscription des transactions sur une blockchain comme Polygon ou Ethereum.</li>
             <li><strong>AWS :</strong> Hébergement sécurisé de cette démonstration en ligne.</li>
         </ul>
-
-        <h2>Commencez la démonstration</h2>
-        <p>
-            Cliquez sur le bouton ci-dessous pour générer un code sécurisé et voir comment il est inscrit sur la blockchain !
-        </p>
-        <button onclick="generateRandomCode()">Générer un code</button>
-        <div id="code-display" class="code-display">Votre code généré apparaîtra ici...</div>
     </div>
 
     <footer>
         <p>© 2025 - Démonstration de la blockchain et de Chainlink</p>
     </footer>
 
+    <!-- Modale pour entrer le code et le commentaire -->
+    <div id="input-modal" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+        <h2>Entrez le code et un commentaire</h2>
+        <input type="text" id="user-code" placeholder="Code" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+        <textarea id="user-comment" placeholder="Commentaire" style="width: 100%; padding: 10px; margin-bottom: 10px;"></textarea>
+        <button onclick="submitInput()">Soumettre</button>
+    </div>
+
     <script>
+        // Étape 1 : Générer un code unique
         async function generateRandomCode() {
             const display = document.getElementById('code-display');
             display.style.display = 'block';
@@ -140,16 +169,35 @@
                 // Simulation d'une requête à Chainlink VRF
                 const randomCode = Math.floor(Math.random() * 1_000_000_000).toString().padStart(9, '0');
                 display.textContent = `Code généré : ${randomCode}`;
-
-                // Simuler une transaction blockchain
-                setTimeout(() => {
-                    display.textContent += '\nTransaction enregistrée sur la blockchain !';
-                }, 2000);
             } catch (error) {
                 display.textContent = 'Erreur lors de la génération du code. Veuillez réessayer.';
                 console.error('Erreur :', error);
             }
         }
-    </script>    
+
+        // Étape 2 : Ouvrir la modale pour entrer le code et le commentaire
+        function openInputModal() {
+            document.getElementById('input-modal').style.display = 'block';
+        }
+
+        // Soumettre le code et le commentaire
+        function submitInput() {
+            const code = document.getElementById('user-code').value;
+            const comment = document.getElementById('user-comment').value;
+            document.getElementById('input-modal').style.display = 'none';
+            console.log('Code:', code, 'Commentaire:', comment);
+        }
+
+        // Étape 3 : Écrire sur la blockchain
+        async function writeToBlockchain() {
+            alert('Fonctionnalité à implémenter : Écrire sur la blockchain BDAG.');
+        }
+
+        // Étape 4 : Afficher un lien vers BDAG Scan
+        function showTransactionLink() {
+            const linkContainer = document.getElementById('transaction-link');
+            linkContainer.innerHTML = '<a href="https://testnet.bdagscan.io/tx/0x..." target="_blank">Voir la transaction sur BDAG Scan</a>';
+        }
+    </script>
 </body>
 </html>
