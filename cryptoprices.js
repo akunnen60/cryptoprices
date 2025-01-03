@@ -3,7 +3,12 @@ const cryptos = [
     { symbol: "ETH", id: "ethereum", fallbackId: "ETH" },
     { symbol: "XRP", id: "ripple", fallbackId: "XRP" },
     { symbol: "SOL", id: "solana", fallbackId: "SOL" },
-    { symbol: "ADA", id: "cardano", fallbackId: "ADA" }
+    { symbol: "ADA", id: "cardano", fallbackId: "ADA" },
+    { symbol: "BNB", id: "binancecoin", fallbackId: "BNB" }, // BNB
+    { symbol: "TRX", id: "tron", fallbackId: "TRX" }, // TRON
+    { symbol: "AVAX", id: "avalanche-2", fallbackId: "AVAX" }, // Avalanche
+    { symbol: "DOGE", id: "dogecoin", fallbackId: "DOGE" }, // Dogecoin
+    { symbol: "LINK", id: "chainlink", fallbackId: "LINK" } // Chainlink
 ];
 
 // Fonction pour récupérer les prix via CoinGecko
@@ -73,18 +78,10 @@ function updateBanner(content) {
     if (banner) {
         banner.innerHTML = content;
 
-        // Calculer la durée de l'animation en fonction de la longueur du texte
-        const textWidth = banner.scrollWidth; // Largeur totale du texte
-        const bannerWidth = banner.clientWidth; // Largeur visible de la bannière
-        const duration = (textWidth / bannerWidth) * 15; // Ajuster la durée (15s par défaut)
-
-        // Appliquer la nouvelle durée
-        banner.style.animation = `scroll ${duration}s linear infinite`;
-
         // Redémarrer l'animation
         banner.style.animation = "none";
         void banner.offsetWidth; // Forcer le reflow
-        banner.style.animation = `scroll ${duration}s linear infinite`;
+        banner.style.animation = "scroll 30s linear infinite"; // Défilement plus lent
     }
 }
 
