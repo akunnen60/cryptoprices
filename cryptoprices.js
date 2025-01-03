@@ -73,8 +73,13 @@ async function fetchCryptoPrices() {
     // Mettre à jour la bannière
     updateBanner(prices.join(" &nbsp; | &nbsp; "));
 }
-
-// Fonction pour mettre à jour la bannière
+function updateBanner(content) {
+    const banner = document.getElementById("crypto-banner");
+    if (banner) {
+        banner.innerHTML = content; // Met à jour le contenu
+    }
+}
+/* Fonction pour mettre à jour la bannière mais avec défilement de droite à gauche
 function updateBanner(content) {
     const banner = document.getElementById("crypto-banner");
     if (banner) {
@@ -95,6 +100,7 @@ function updateBanner(content) {
         banner.style.animation = `scroll ${duration}s linear infinite`;
     }
 }
+*/
 
 // Charger les prix au démarrage et toutes les 10 secondes
 fetchCryptoPrices();
