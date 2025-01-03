@@ -76,12 +76,21 @@ async function fetchCryptoPrices() {
 function updateBanner(content) {
     const banner = document.getElementById("crypto-banner");
     if (banner) {
-        banner.innerHTML = content;
+        // Répéter le texte pour créer un effet de boucle fluide
+        banner.innerHTML = content + " &nbsp; | &nbsp; " + content;
+
+        // Calculer la durée de l'animation en fonction de la longueur du texte
+        const textWidth = banner.scrollWidth / 2; // Largeur du texte (divisé par 2 car on l'a répété)
+        const bannerWidth = banner.clientWidth; // Largeur visible de la bannière
+        const duration = (textWidth / bannerWidth) * 15; // Ajuster la durée (15s par défaut)
+
+        // Appliquer la nouvelle durée
+        banner.style.animation = `scroll ${duration}s linear infinite`;
 
         // Redémarrer l'animation
         banner.style.animation = "none";
         void banner.offsetWidth; // Forcer le reflow
-        banner.style.animation = "scroll 30s linear infinite"; // Défilement plus lent
+        banner.style.animation = `scroll ${duration}s linear infinite`;
     }
 }
 
