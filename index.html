@@ -119,6 +119,10 @@
             <li><strong>Décentralisation :</strong> Aucune entité centrale ne contrôle la génération du nombre, ce qui renforce la confiance.</li>
         </ul>
         <button onclick="generateRandomCode()">Générer un code</button>
+        <button id="verify-button" style="display: none; background-color: blue; color: white;" onclick="openVerifyModal()">Vérifier le code unique</button>
+        <p style="font-size: 12px; color: #666; margin-top: 5px;">
+            La vérification est simulée. Pour une vérification réelle, achetez des jetons Chainlink.
+        </p>
         <div id="code-display" class="code-display">Votre code généré apparaîtra ici...</div>
 
         <!-- Étape 2 : Demander un code et un commentaire -->
@@ -175,6 +179,15 @@
         <button onclick="submitInput()">Soumettre</button>
     </div>
 
+    <!-- Modale pour vérifier le code unique -->
+    <div id="verify-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+        <h2>Vérification du code unique</h2>
+        <p><strong>Code généré :</strong> <span id="verify-code"></span></p>
+        <p><strong>Preuve cryptographique :</strong> <span id="verify-proof"></span></p>
+        <p><strong>Résultat de la vérification :</strong> <span id="verify-result"></span></p>
+        <button onclick="closeVerifyModal()">Fermer</button>
+    </div>
+
     <script>
         // Étape 1 : Générer un code unique
         async function generateRandomCode() {
@@ -190,6 +203,9 @@
 
                 // Stocker le code pour l'utiliser dans la modale
                 window.generatedCode = uniqueCode;
+
+                // Afficher le bouton "Vérifier le code unique"
+                document.getElementById('verify-button').style.display = 'inline-block';
             } catch (error) {
                 display.textContent = 'Erreur lors de la génération du code. Veuillez réessayer.';
                 console.error('Erreur :', error);
@@ -258,6 +274,34 @@
         function showTransactionLink() {
             const linkContainer = document.getElementById('transaction-link');
             linkContainer.innerHTML = '<a href="https://testnet.bdagscan.io/tx/0x..." target="_blank">Voir la transaction sur BDAG Scan</a>';
+        }
+
+        // Fonction pour ouvrir la fenêtre modale de vérification
+        function openVerifyModal() {
+            const modal = document.getElementById('verify-modal');
+            const verifyCode = document.getElementById('verify-code');
+            const verifyProof = document.getElementById('verify-proof');
+            const verifyResult = document.getElementById('verify-result');
+
+            // Afficher le code généré
+            verifyCode.textContent = window.generatedCode;
+
+            // Simuler une preuve cryptographique
+            const proof = "0x" + Math.random().toString(16).substring(2, 18); // Simulation de la preuve
+            verifyProof.textContent = proof;
+
+            // Simuler la vérification de la preuve
+            const isValid = true; // Simulation de la validation
+            verifyResult.textContent = isValid ? "✅ Preuve valide (simulation)" : "❌ Preuve invalide";
+            verifyResult.style.color = isValid ? "green" : "red";
+
+            // Afficher la modale
+            modal.style.display = 'block';
+        }
+
+        // Fonction pour fermer la fenêtre modale de vérification
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
         }
     </script>
 </body>
