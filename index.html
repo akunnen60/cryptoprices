@@ -90,21 +90,6 @@
         <h1>Démo : Sécuriser une transaction avec Chainlink et Blockchain</h1>
     </header>
     <div class="container">
-        <!-- Introduction -->
-        <h2>Introduction</h2>
-        <p>
-            Découvrez comment utiliser la puissance de la blockchain et de Chainlink VRF pour
-            sécuriser des transactions de manière immuable et transparente.
-        </p>
-
-        <!-- Objectifs de la démonstration -->
-        <h2>Objectifs de la démonstration</h2>
-        <ol>
-            <li><strong>Génération d’un code aléatoire sécurisé :</strong> Utilisation de Chainlink VRF pour créer un code unique et vérifiable.</li>
-            <li><strong>Création d’une transaction immuable :</strong> Le code est inscrit sur une blockchain publique, garantissant transparence et intégrité.</li>
-            <li><strong>Démonstration pratique :</strong> Explorez un cas réel d'application de ces technologies.</li>
-        </ol>
-
         <!-- Étape 1 : Générer un code unique avec Chainlink VRF -->
         <h2>Étape 1 : Générer un code unique</h2>
         <p>
@@ -119,6 +104,10 @@
             Entrez le code généré et un commentaire pour créer une transaction. Ces informations seront enregistrées sur la blockchain.
         </p>
         <button onclick="openInputModal()">Entrer le code et le commentaire</button>
+        <div id="submitted-data" class="code-display" style="display: none;">
+            Code soumis : <span id="submitted-code"></span><br>
+            Commentaire : <span id="submitted-comment"></span>
+        </div>
 
         <!-- Étape 3 : Écrire une transaction sur la blockchain -->
         <h2>Étape 3 : Écrire une transaction sur la blockchain</h2>
@@ -134,21 +123,6 @@
         </p>
         <button onclick="showTransactionLink()">Voir la transaction</button>
         <div id="transaction-link" style="margin-top: 20px;"></div>
-
-        <!-- Pourquoi ce projet est important ? -->
-        <h2>Pourquoi ce projet est important ?</h2>
-        <p>
-            La blockchain offre une solution pour sécuriser les transactions, garantir leur immuabilité, et créer des systèmes transparents. 
-            Ce projet démontre comment combiner les technologies de Chainlink et des blockchains pour répondre à des besoins variés.
-        </p>
-
-        <!-- Technologies utilisées -->
-        <h2>Technologies utilisées</h2>
-        <ul>
-            <li><strong>Chainlink VRF :</strong> Génération de codes aléatoires sécurisés et vérifiables.</li>
-            <li><strong>Blockchain publique :</strong> Inscription des transactions sur une blockchain comme Polygon ou Ethereum.</li>
-            <li><strong>AWS :</strong> Hébergement sécurisé de cette démonstration en ligne.</li>
-        </ul>
     </div>
 
     <footer>
@@ -224,11 +198,17 @@
             // Fermer la modale
             document.getElementById('input-modal').style.display = 'none';
 
+            // Afficher les données soumises dans le bandeau noir
+            const submittedData = document.getElementById('submitted-data');
+            const submittedCode = document.getElementById('submitted-code');
+            const submittedComment = document.getElementById('submitted-comment');
+
+            submittedCode.textContent = code;
+            submittedComment.textContent = comment;
+            submittedData.style.display = 'block';
+
             // Afficher les données soumises dans la console (ou les traiter)
             console.log('Code:', code, 'Commentaire:', comment);
-
-            // Optionnel : Afficher un message de confirmation à l'utilisateur
-            alert('Données soumises avec succès !');
         }
 
         // Étape 3 : Écrire sur la blockchain
