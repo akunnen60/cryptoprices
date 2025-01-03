@@ -6,16 +6,18 @@
     <title>Démo : Sécuriser une transaction avec Chainlink et Blockchain</title>
     <style>
         #crypto-banner {
-            white-space: nowrap; /* Empêche le texte de passer à la ligne */
-            overflow: hidden; /* Cache le texte qui dépasse */
-            box-sizing: border-box;
+            text-align: center; /* Centrer le texte */
+            font-weight: bold; /* Texte en gras */
             background-color: #FBFAF3;
             padding: 10px;
             font-family: Arial, sans-serif;
             font-size: 16px;
             color: #333;
-            position: relative; /* Pour que l'animation fonctionne correctement */
-            animation: scroll 80s linear infinite; /* Défilement lent */
+            position: fixed; /* Bannière fixe en haut */
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000; /* S'assurer qu'elle est au-dessus du reste */
         }
         body {
             font-family: Arial, sans-serif;
@@ -164,30 +166,46 @@
             const display = document.getElementById('code-display');
             display.style.display = 'block';
             display.textContent = 'Génération en cours...';
-
+        
             try {
                 // Simulation d'une requête à Chainlink VRF
                 const randomCode = Math.floor(Math.random() * 1_000_000_000).toString().padStart(9, '0');
-                display.textContent = `Code généré : ${randomCode}`;
+                const uniqueCode = generateUniqueCode(randomCode); // Ajoute la date/heure
+                display.textContent = `Code généré : ${uniqueCode}`;
+        
+                // Stocker le code pour l'utiliser dans la modale
+                window.generatedCode = uniqueCode;
             } catch (error) {
                 display.textContent = 'Erreur lors de la génération du code. Veuillez réessayer.';
                 console.error('Erreur :', error);
             }
         }
-
+        function generateUniqueCode(randomCode) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // Mois (01-12)
+            const day = String(now.getDate()).padStart(2, '0'); // Jour (01-31)
+            const hours = String(now.getHours()).padStart(2, '0'); // Heures (00-23)
+            const minutes = String(now.getMinutes()).padStart(2, '0'); // Minutes (00-59)
+            const seconds = String(now.getSeconds()).padStart(2, '0'); // Secondes (00-59)
+        
+            // Format : YYYYMMDDHHMMSS + code Chainlink
+            return `${year}${month}${day}${hours}${minutes}${seconds}${randomCode}`;
+        }
         // Étape 2 : Ouvrir la modale pour entrer le code et le commentaire
         function openInputModal() {
-            document.getElementById('input-modal').style.display = 'block';
-        }
+           const modal = document.getElementById('input-modal');
+           const codeInput = document.getElementById('user-code');
 
-        // Soumettre le code et le commentaire
-        function submitInput() {
-            const code = document.getElementById('user-code').value;
-            const comment = document.getElementById('user-comment').value;
-            document.getElementById('input-modal').style.display = 'none';
-            console.log('Code:', code, 'Commentaire:', comment);
-        }
+           // Pré-remplir le champ Code avec le code généré
+           if (window.generatedCode) {
+              codeInput.value = window.generatedCode;
+           } else {
+              codeInput.value = ''; // Si aucun code n'a été généré
+           }
 
+           modal.style.display = 'block'; // Afficher la modale
+        }
         // Étape 3 : Écrire sur la blockchain
         async function writeToBlockchain() {
             alert('Fonctionnalité à implémenter : Écrire sur la blockchain BDAG.');
