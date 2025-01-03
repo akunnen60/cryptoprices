@@ -6,15 +6,16 @@
     <title>Démo : Sécuriser une transaction avec Chainlink et Blockchain</title>
     <style>
         #crypto-banner {
-            background: #FBFAF3;
-            color: #503AA8;
+            white-space: nowrap; /* Empêche le texte de passer à la ligne */
+            overflow: hidden; /* Cache le texte qui dépasse */
+            box-sizing: border-box;
+            background-color: #f0f0f0;
             padding: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            overflow: hidden;
-            white-space: nowrap;
-            text-align: center;
-            animation: scroll 30s linear infinite; /* Ajuster ici pour ralentir ou accélérer */
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            color: #333;
+            position: relative; /* Pour que l'animation fonctionne correctement */
+            animation: scroll 30s linear infinite; /* Défilement lent */
         }
         body {
             font-family: Arial, sans-serif;
@@ -72,12 +73,8 @@
             color: #fff;
         }
         @keyframes scroll {
-            0% {
-                transform: translateX(100%);
-            }
-            100% {
-                transform: translateX(-100%);
-            }
+            0% { transform: translateX(100%); } /* Commence complètement à droite */
+            100% { transform: translateX(-100%); } /* Termine complètement à gauche */
         }
     </style>
 </head>
