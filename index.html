@@ -266,9 +266,51 @@
         }
 
         // Étape 3 : Écrire sur la blockchain
+        // Adresse du contrat déployé
+        const contractAddress = "0x4450dC98538f71ddBE647e122b25486F3e19bE4D"; // Remplace par l'adresse de ton contrat
+        const contractABI = [ /* ABI du contrat */ ]; // Remplace par l'ABI généré par l'IDE BlockDAG
+        
+        // Fonction pour écrire sur la blockchain
         async function writeToBlockchain() {
-            alert('Fonctionnalité à implémenter : Écrire sur la blockchain BDAG.');
+            const code = window.generatedCode; // Code généré
+            const comment = document.getElementById('user-comment').value; // Commentaire
+        
+            if (!code || !comment) {
+                alert("Veuillez générer un code et entrer un commentaire.");
+                return;
+            }
+        
+            // Se connecter à MetaMask ou un autre wallet
+            if (typeof window.ethereum === 'undefined') {
+                alert("Veuillez installer MetaMask.");
+                return;
+            }
+        
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        
+            try {
+                // Envoyer la transaction
+                const tx = await contract.recordTransaction(code, comment);
+                console.log("Transaction envoyée :", tx.hash);
+        
+                // Attendre la confirmation de la transaction
+                await tx.wait();
+                console.log("Transaction confirmée :", tx.hash);
+        
+                // Afficher le lien vers l'explorateur BlockDAG
+                const explorerUrl = `https://explorer.blockdag.network/tx/${tx.hash}`;
+                const linkContainer = document.getElementById('transaction-link');
+                linkContainer.innerHTML = `<a href="${explorerUrl}" target="_blank">Voir la transaction sur BlockDAG Explorer</a>`;
+            } catch (error) {
+                console.error("Erreur lors de l'envoi de la transaction :", error);
+                alert("Erreur lors de l'envoi de la transaction. Voir la console pour plus de détails.");
+            }
         }
+        //async function writeToBlockchain() {
+        //    alert('Fonctionnalité à implémenter : Écrire sur la blockchain BDAG.');
+        //}
 
         // Étape 4 : Afficher un lien vers BDAG Scan
         function showTransactionLink() {
