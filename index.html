@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Démo : Sécuriser une transaction avec Chainlink et Blockchain</title>
+    <!-- Ajouter ethers.js -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <style>
+        /* Votre CSS existant */
         #crypto-banner {
             text-align: center; /* Centrer le texte */
             font-weight: bold; /* Texte en gras */
@@ -189,6 +192,32 @@
     </div>
 
     <script>
+        // Vérifier si MetaMask est installé
+        if (typeof window.ethereum === "undefined") {
+            alert("Veuillez installer MetaMask.");
+        }
+
+        // Fonction pour initialiser le provider et le signer
+        async function initializeProvider() {
+            if (typeof window.ethereum === "undefined") {
+                console.error("MetaMask n'est pas installé.");
+                return;
+            }
+
+            try {
+                // Demander à l'utilisateur de se connecter à MetaMask
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                // Initialiser le provider et le signer
+                const provider = new ethers.providers.Web3Provider(window.ethereum); // Correction ici
+                const signer = provider.getSigner();
+                console.log("Provider et signer initialisés avec succès.");
+                return { provider, signer };
+            } catch (error) {
+                console.error("Erreur lors de l'initialisation du provider :", error);
+            }
+        }
+
         // Étape 1 : Générer un code unique
         async function generateRandomCode() {
             const display = document.getElementById('code-display');
@@ -266,171 +295,33 @@
         }
 
         // Étape 3 : Écrire sur la blockchain
-        // Adresse du contrat déployé
-        const contractAddress = "0x4450dC98538f71ddBE647e122b25486F3e19bE4D"; // Remplace par l'adresse de ton contrat
-        const contractABI = [ [
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_uniqueCode",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_comment",
-				"type": "string"
-			}
-		],
-		"name": "recordTransaction",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "uniqueCode",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "comment",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "TransactionRecorded",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "index",
-				"type": "uint256"
-			}
-		],
-		"name": "getTransaction",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "uniqueCode",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "comment",
-				"type": "string"
-			},
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getTransactionCount",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "transactions",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "uniqueCode",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "comment",
-				"type": "string"
-			},
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-] ]; // Remplace par l'ABI généré par l'IDE BlockDAG
-        
-        // Fonction pour écrire sur la blockchain
         async function writeToBlockchain() {
+            const { provider, signer } = await initializeProvider();
+            if (!provider || !signer) {
+                console.error("Provider ou signer non initialisé.");
+                return;
+            }
+
             const code = window.generatedCode; // Code généré
             const comment = document.getElementById('user-comment').value; // Commentaire
-        
+
             if (!code || !comment) {
                 alert("Veuillez générer un code et entrer un commentaire.");
                 return;
             }
-        
-            // Se connecter à MetaMask ou un autre wallet
-            if (typeof window.ethereum === 'undefined') {
-                alert("Veuillez installer MetaMask.");
-                return;
-            }
-        
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const contract = new ethers.Contract(contractAddress, contractABI, signer);
-        
+
+            // Adresse du contrat et ABI
+            const contractAddress = "0x4450dC98538f71ddBE647e122b25486F3e19bE4D";
+            const contractABI = [ /* Votre ABI ici */ ];
+
             try {
-                // Envoyer la transaction
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
                 const tx = await contract.recordTransaction(code, comment);
                 console.log("Transaction envoyée :", tx.hash);
-        
-                // Attendre la confirmation de la transaction
+
                 await tx.wait();
                 console.log("Transaction confirmée :", tx.hash);
-        
-                // Afficher le lien vers l'explorateur BlockDAG
+
                 const explorerUrl = `https://explorer.blockdag.network/tx/${tx.hash}`;
                 const linkContainer = document.getElementById('transaction-link');
                 linkContainer.innerHTML = `<a href="${explorerUrl}" target="_blank">Voir la transaction sur BlockDAG Explorer</a>`;
@@ -439,9 +330,6 @@
                 alert("Erreur lors de l'envoi de la transaction. Voir la console pour plus de détails.");
             }
         }
-        //async function writeToBlockchain() {
-        //    alert('Fonctionnalité à implémenter : Écrire sur la blockchain BDAG.');
-        //}
 
         // Étape 4 : Afficher un lien vers BDAG Scan
         function showTransactionLink() {
