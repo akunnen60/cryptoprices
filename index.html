@@ -145,9 +145,8 @@
         </p>
         <button onclick="writeToBlockchain()">Écrire sur la blockchain</button>
         <div id="transaction-hash-display" class="code-display" style="display: none; margin-top: 20px;">
-            Code de la tranaction: <span id="submittedCode.textContent"></span>
-            Résultat de la blockchain Bdag: <span id="submittedComment.textContent"></span>
-            <!-- Le hash de la transaction ou le message d'erreur apparaîtra ici -->
+            Code de la transaction: <span id="submitted-code"></span><br>
+            Résultat de la blockchain Bdag: <span id="submitted-comment"></span>
         </div>
 
         <!-- Étape 4 : Afficher un lien vers BDAG Scan -->
@@ -204,7 +203,8 @@
         // Fonction pour initialiser le provider et le signer
         async function initializeProvider() {
             if (typeof window.ethereum === "undefined") {
-                console.error("MetaMask n'est pas installé.");
+                console.error("MetaMask n'est pas installé.");    
+                document.querySelectorAll('button').forEach(button => button.disabled = true);
                 return null; // Retourne null si MetaMask n'est pas installé
             }
 
@@ -283,6 +283,10 @@
             const code = document.getElementById('user-code').value;
             const comment = document.getElementById('user-comment').value;
 
+            if (!code || !comment) {
+                alert("Veuillez entrer un code et un commentaire valides.");
+                return;
+            }
             // Fermer la modale
             document.getElementById('input-modal').style.display = 'none';
 
@@ -479,15 +483,16 @@
                 console.error("Erreur lors de l'envoi de la transaction :", error);
                 const transactionHashDisplay = document.getElementById('transaction-hash-display');
                 transactionHashDisplay.style.display = 'block';
-                transactionHashDisplay.textContent = `Erreur : ${error.message}`;
+                transactionHashDisplay.textContent = `Erreur : ${error.message || "Une erreur s'est produite lors de l'envoi de la transaction."}`;
             }
         }
 
         // Étape 4 : Afficher un lien vers BDAG Scan
         function showTransactionLink() {
+            const transactionHash = document.getElementById('transaction-hash-display').textContent.split(': ')[1];
             const linkContainer = document.getElementById('transaction-link');
-            linkContainer.innerHTML = '<a href="https://testnet.bdagscan.io/tx/0x..." target="_blank">Voir la transaction sur BDAG Scan</a>';
-        }
+            linkContainer.innerHTML = `<a href="https://testnet.bdagscan.io/tx/${transactionHash}" target="_blank">Voir la transaction sur BDAG Scan</a>`;
+}
 
         // Fonction pour ouvrir la fenêtre modale de vérification
         function openVerifyModal() {
