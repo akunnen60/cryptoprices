@@ -445,21 +445,30 @@
 		"type": "function"
 	} ];
 
-            try {
-                const contract = new ethers.Contract(contractAddress, contractABI, signer);
-                const tx = await contract.recordTransaction(code, comment);
-                console.log("Transaction envoyée :", tx.hash);
-
-                await tx.wait();
-                console.log("Transaction confirmée :", tx.hash);
-
-                const explorerUrl = `https://explorer.blockdag.network/tx/${tx.hash}`;
-                const linkContainer = document.getElementById('transaction-link');
-                linkContainer.innerHTML = `<a href="${explorerUrl}" target="_blank">Voir la transaction sur BlockDAG Explorer</a>`;
-            } catch (error) {
-                console.error("Erreur lors de l'envoi de la transaction :", error);
-                alert("Erreur lors de l'envoi de la transaction. Voir la console pour plus de détails.");
-            }
+	try {
+	        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+	        const tx = await contract.recordTransaction(code, comment);
+	        console.log("Transaction envoyée :", tx.hash);
+	
+	        // Attendre la confirmation de la transaction
+	        const receipt = await tx.wait();
+	        console.log("Transaction confirmée :", receipt);
+	
+	        // Vérifier le statut de la transaction
+	        if (receipt.status === 1) {
+	            console.log("Transaction réussie !");
+	            const explorerUrl = `https://explorer.blockdag.network/tx/${tx.hash}`;
+	            const linkContainer = document.getElementById('transaction-link');
+	            linkContainer.innerHTML = `<a href="${explorerUrl}" target="_blank">Voir la transaction sur BlockDAG Explorer</a>`;
+	        } else {
+	            console.error("La transaction a échoué.");
+	            alert("La transaction a échoué. Voir la console pour plus de détails.");
+	        }
+	    } catch (error) {
+	        console.error("Erreur lors de l'envoi de la transaction :", error);
+	        if (error.data) {
+	            console.error("Données d'erreur :", error.data);
+	    }
         }
 
         // Étape 4 : Afficher un lien vers BDAG Scan
