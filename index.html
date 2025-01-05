@@ -313,7 +313,7 @@
 
             // Adresse du contrat et ABI
             const contractAddress = "0x3FDF14321C67A004e666f0beC1C0050C23227f9C";
-            const contractABI = [ [
+            const contractABI = [
 	{
 		"anonymous": false,
 		"inputs": [
@@ -443,8 +443,7 @@
 		],
 		"stateMutability": "view",
 		"type": "function"
-	}
-] ];
+	} ];
 
             try {
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
