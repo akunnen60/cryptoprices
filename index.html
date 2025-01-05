@@ -144,6 +144,9 @@
             Enregistrez le code et le commentaire sur la blockchain BDAG (testnet). Cette étape garantit l'immuabilité et la transparence de la transaction.
         </p>
         <button onclick="writeToBlockchain()">Écrire sur la blockchain</button>
+        <div id="transaction-hash-display" class="code-display" style="display: none; margin-top: 20px;">
+            <!-- Le hash de la transaction ou le message d'erreur apparaîtra ici -->
+        </div>
 
         <!-- Étape 4 : Afficher un lien vers BDAG Scan -->
         <h2>Étape 4 : Voir la transaction sur BDAG Scan</h2>
@@ -455,6 +458,11 @@
                 const receipt = await tx.wait();
                 console.log("Transaction confirmée :", receipt);
 
+                // Afficher le hash de la transaction dans le cadre noir
+                const transactionHashDisplay = document.getElementById('transaction-hash-display');
+                transactionHashDisplay.style.display = 'block';
+                transactionHashDisplay.textContent = `Hash de la transaction : ${tx.hash}`;
+
                 // Vérifier le statut de la transaction
                 if (receipt.status === 1) {
                     console.log("Transaction réussie !");
@@ -463,13 +471,13 @@
                     linkContainer.innerHTML = `<a href="${explorerUrl}" target="_blank">Voir la transaction sur BlockDAG Explorer</a>`;
                 } else {
                     console.error("La transaction a échoué.");
-                    alert("La transaction a échoué. Voir la console pour plus de détails.");
+                    transactionHashDisplay.textContent = "La transaction a échoué. Voir la console pour plus de détails.";
                 }
             } catch (error) {
                 console.error("Erreur lors de l'envoi de la transaction :", error);
-                if (error.data) {
-                    console.error("Données d'erreur :", error.data);
-                }
+                const transactionHashDisplay = document.getElementById('transaction-hash-display');
+                transactionHashDisplay.style.display = 'block';
+                transactionHashDisplay.textContent = `Erreur : ${error.message}`;
             }
         }
 
