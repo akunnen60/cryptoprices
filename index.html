@@ -83,6 +83,21 @@
         .red {
             color: red;
         }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #503AA8;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -445,30 +460,42 @@
                 console.error("Impossible d'initialiser le provider.");
                 return;
             }
-
+        
             const { provider, signer } = result; // Destructure le résultat
             const code = window.generatedCode; // Code généré
             const comment = document.getElementById('user-comment').value; // Commentaire
-
+        
             if (!code || !comment) {
                 alert("Veuillez générer un code et entrer un commentaire.");
                 return;
             }
-
+        
+            // Afficher un message d'attente
+            const transactionHashDisplay = document.getElementById('transaction-hash-display');
+            transactionHashDisplay.style.display = 'block';
+            transactionHashDisplay.innerHTML = `<div class="spinner"></div> Attente du retour de l'écriture de la transaction BDag...`;
+        
+            // Définir un délai d'attente de 30 secondes
+            const timeout = setTimeout(() => {
+                transactionHashDisplay.textContent = "Délai d'attente dépassé. La blockchain met trop de temps à répondre.";
+                console.error("Délai d'attente dépassé.");
+            }, 30000); // 30 secondes
+        
             try {
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
                 const tx = await contract.recordTransaction(code, comment);
                 console.log("Transaction envoyée :", tx.hash);
-
+        
+                // Annuler le délai d'attente si la blockchain répond
+                clearTimeout(timeout);
+        
                 // Attendre la confirmation de la transaction
                 const receipt = await tx.wait();
                 console.log("Transaction confirmée :", receipt);
-
+        
                 // Afficher le hash de la transaction dans le cadre noir
-                const transactionHashDisplay = document.getElementById('transaction-hash-display');
-                transactionHashDisplay.style.display = 'block';
                 transactionHashDisplay.textContent = `Hash de la transaction : ${tx.hash}`;
-
+        
                 // Vérifier le statut de la transaction
                 if (receipt.status === 1) {
                     console.log("Transaction réussie !");
@@ -480,13 +507,14 @@
                     transactionHashDisplay.textContent = "La transaction a échoué. Voir la console pour plus de détails.";
                 }
             } catch (error) {
+                // Annuler le délai d'attente en cas d'erreur
+                clearTimeout(timeout);
+        
                 console.error("Erreur lors de l'envoi de la transaction :", error);
-                const transactionHashDisplay = document.getElementById('transaction-hash-display');
-                transactionHashDisplay.style.display = 'block';
                 transactionHashDisplay.textContent = `Erreur : ${error.message || "Une erreur s'est produite lors de l'envoi de la transaction."}`;
             }
         }
-
+        
         // Étape 4 : Afficher un lien vers BDAG Scan
         function showTransactionLink() {
             const transactionHash = document.getElementById('transaction-hash-display').textContent.split(': ')[1];
