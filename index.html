@@ -7,7 +7,82 @@
     <!-- Ajouter ethers.js -->
     <script src="ethers.umd.min.js"></script>
     <style>
-        /* Votre CSS existant */
+        #crypto-banner {
+            text-align: center; /* Centrer le texte */
+            font-weight: bold; /* Texte en gras */
+            background-color: #FBFAF3;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            color: #333;
+            position: fixed; /* Bannière fixe en haut */
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000; /* S'assurer qu'elle est au-dessus du reste */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #FBFAF3;
+            color: #333;
+            padding-top: 60px; /* Pour éviter que la bannière ne chevauche le contenu */
+        }
+        header {
+            background: #4CAF50;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #503AA8;
+        }
+        button {
+            background-color: #503AA8;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .code-display {
+            background: #000;
+            color: #fff;
+            padding: 10px;
+            font-size: 18px;
+            margin-top: 10px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            background: #333;
+            color: #fff;
+        }
+        .green {
+            color: green;
+        }
+        .red {
+            color: red;
+        }
     </style>
 </head>
 <body>
