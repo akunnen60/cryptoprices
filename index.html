@@ -7,7 +7,6 @@
     <!-- Ajouter ethers.js -->
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <style>
-        /* Votre CSS existant */
         #crypto-banner {
             text-align: center; /* Centrer le texte */
             font-weight: bold; /* Texte en gras */
@@ -194,14 +193,14 @@
     <script>
         // Vérifier si MetaMask est installé
         if (typeof window.ethereum === "undefined") {
-            alert("Veuillez installer MetaMask.");
+            alert("Veuillez installer MetaMask pour utiliser cette application.");
         }
 
         // Fonction pour initialiser le provider et le signer
         async function initializeProvider() {
             if (typeof window.ethereum === "undefined") {
                 console.error("MetaMask n'est pas installé.");
-                return;
+                return null; // Retourne null si MetaMask n'est pas installé
             }
 
             try {
@@ -209,12 +208,13 @@
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
 
                 // Initialiser le provider et le signer
-                const provider = new ethers.providers.Web3Provider(window.ethereum); // Correction ici
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
                 console.log("Provider et signer initialisés avec succès.");
-                return { provider, signer };
+                return { provider, signer }; // Retourne les objets provider et signer
             } catch (error) {
                 console.error("Erreur lors de l'initialisation du provider :", error);
+                return null; // Retourne null en cas d'erreur
             }
         }
 
@@ -296,12 +296,13 @@
 
         // Étape 3 : Écrire sur la blockchain
         async function writeToBlockchain() {
-            const { provider, signer } = await initializeProvider();
-            if (!provider || !signer) {
-                console.error("Provider ou signer non initialisé.");
+            const result = await initializeProvider();
+            if (!result) {
+                console.error("Impossible d'initialiser le provider.");
                 return;
             }
 
+            const { provider, signer } = result; // Destructure le résultat
             const code = window.generatedCode; // Code généré
             const comment = document.getElementById('user-comment').value; // Commentaire
 
