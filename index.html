@@ -547,6 +547,17 @@
                 return;
             }
 
+            // Afficher un message d'attente
+            const transactionDataDisplay = document.getElementById('transaction-data-display');
+            transactionDataDisplay.style.display = 'block';
+            transactionDataDisplay.innerHTML = `<div class="spinner"></div> Requête envoyée à BDAG...`;
+
+            // Définir un délai d'attente de 60 secondes
+            const timeout = setTimeout(() => {
+                transactionDataDisplay.textContent = "Délai d'attente dépassé. La blockchain met trop de temps à répondre.";
+                console.error("Délai d'attente dépassé.");
+            }, 60000); // 60 secondes
+
             try {
                 // Initialiser le provider
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -567,6 +578,9 @@
                 const sender = decodedLogs.args.sender;
                 const timestamp = new Date(decodedLogs.args.timestamp * 1000).toLocaleString(); // Convertir le timestamp en date lisible
 
+                // Annuler le délai d'attente si la blockchain répond
+                clearTimeout(timeout);
+
                 // Afficher les données dans le conteneur
                 document.getElementById('display-unique-code').textContent = uniqueCode;
                 document.getElementById('display-comment').textContent = comment;
@@ -580,10 +594,13 @@
                 explorerLink.textContent = "Voir la transaction sur BDAG Scan";
 
                 // Afficher le conteneur
-                document.getElementById('transaction-data-display').style.display = 'block';
+                transactionDataDisplay.style.display = 'block';
             } catch (error) {
+                // Annuler le délai d'attente en cas d'erreur
+                clearTimeout(timeout);
+
                 console.error("Erreur lors de la récupération des données de la transaction :", error);
-                alert("Une erreur s'est produite lors de la récupération des données de la transaction. Voir la console pour plus de détails.");
+                transactionDataDisplay.textContent = `Erreur : ${error.message || "Une erreur s'est produite lors de la récupération des données de la transaction."}`;
             }
         }
 
