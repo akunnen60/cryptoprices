@@ -225,482 +225,425 @@
     </div>
 
     <script>
-        // Vérifier si MetaMask est installé
-        if (typeof window.ethereum === "undefined") {
-            alert("Veuillez installer MetaMask pour utiliser cette application.");
-        }
-
-        // Fonction pour initialiser le provider et le signer
-        async function initializeProvider() {
+        // Attendre que le DOM soit entièrement chargé avant d'exécuter le script
+        document.addEventListener('DOMContentLoaded', () => {
+            // Vérifier si MetaMask est installé
             if (typeof window.ethereum === "undefined") {
-                console.error("MetaMask n'est pas installé.");    
-                document.querySelectorAll('button').forEach(button => button.disabled = true);
-                return null; // Retourne null si MetaMask n'est pas installé
+                alert("Veuillez installer MetaMask pour utiliser cette application.");
             }
 
-            try {
-                // Demander à l'utilisateur de se connecter à MetaMask
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-                // Initialiser le provider et le signer
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
-                console.log("Provider et signer initialisés avec succès.");
-                return { provider, signer }; // Retourne les objets provider et signer
-            } catch (error) {
-                console.error("Erreur lors de l'initialisation du provider :", error);
-                return null; // Retourne null en cas d'erreur
-            }
-        }
-
-        // Étape 1 : Générer un code unique
-        async function generateRandomCode() {
-            const display = document.getElementById('code-display');
-            display.style.display = 'block';
-            display.textContent = 'Génération en cours...';
-
-            try {
-                // Simulation d'une requête à Chainlink VRF
-                const randomCode = Math.floor(Math.random() * 1_000_000_000).toString().padStart(9, '0');
-                const uniqueCode = generateUniqueCode(randomCode); // Ajoute la date/heure
-                display.textContent = `Code généré : ${uniqueCode}`;
-
-                // Stocker le code pour l'utiliser dans la modale
-                window.generatedCode = uniqueCode;
-
-                // Afficher le bouton "Vérifier le code unique"
-                document.getElementById('verify-button').style.display = 'inline-block';
-            } catch (error) {
-                display.textContent = 'Erreur lors de la génération du code. Veuillez réessayer.';
-                console.error('Erreur :', error);
-            }
-        }
-
-        // Fonction pour générer un code unique avec date/heure
-        function generateUniqueCode(randomCode) {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            return `${year}${month}${day}${hours}${minutes}${seconds}${randomCode}`;
-        }
-
-        // Étape 2 : Ouvrir la modale pour entrer le code et le commentaire
-        function openInputModal() {
-            const modal = document.getElementById('input-modal');
-            const codeInput = document.getElementById('user-code');
-            const commentInput = document.getElementById('user-comment');
-
-            // Pré-remplir le champ Code avec le code généré
-            if (window.generatedCode) {
-                codeInput.value = window.generatedCode;
-            } else {
-                codeInput.value = ''; // Si aucun code n'a été généré
-            }
-
-            // Réinitialiser le champ Commentaire
-            commentInput.value = '';
-
-            // Afficher la modale
-            modal.style.display = 'block';
-        }
-
-        // Soumettre le code et le commentaire
-        function submitInput() {
-            const code = document.getElementById('user-code').value;
-            const comment = document.getElementById('user-comment').value;
-
-            if (!code || !comment) {
-                alert("Veuillez entrer un code et un commentaire valides.");
-                return;
-            }
-            // Fermer la modale
-            document.getElementById('input-modal').style.display = 'none';
-
-            // Afficher les données soumises dans le bandeau noir
-            const submittedData = document.getElementById('submitted-data');
-            const submittedCode = document.getElementById('submitted-code');
-            const submittedComment = document.getElementById('submitted-comment');
-
-            submittedCode.textContent = code;
-            submittedComment.textContent = comment;
-            submittedData.style.display = 'block';
-
-            // Afficher les données soumises dans la console (ou les traiter)
-            console.log('Code:', code, 'Commentaire:', comment);
-        }
-
-        // Adresse du contrat et ABI
-        const contractAddress = "0x3FDF14321C67A004e666f0beC1C0050C23227f9C";
-        const contractABI = [
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "uniqueCode",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "comment",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "address",
-                        "name": "sender",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "timestamp",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "TransactionRecorded",
-                "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "index",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "getTransaction",
-                "outputs": [
-                    {
-                        "internalType": "string",
-                        "name": "uniqueCode",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "comment",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "sender",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "timestamp",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getTransactionCount",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "string",
-                        "name": "_uniqueCode",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_comment",
-                        "type": "string"
-                    }
-                ],
-                "name": "recordTransaction",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "transactions",
-                "outputs": [
-                    {
-                        "internalType": "string",
-                        "name": "uniqueCode",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "comment",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "sender",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "timestamp",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ];
-
-        // Étape 3 : Écrire sur la blockchain
-        async function writeToBlockchain() {
-            const result = await initializeProvider();
-            if (!result) {
-                console.error("Impossible d'initialiser le provider.");
-                return;
-            }
-        
-            const { provider, signer } = result; // Destructure le résultat
-            const code = window.generatedCode; // Code généré
-            const comment = document.getElementById('user-comment').value; // Commentaire
-        
-            if (!code || !comment) {
-                alert("Veuillez générer un code et entrer un commentaire.");
-                return;
-            }
-        
-            // Afficher un message d'attente
-            const transactionHashDisplay = document.getElementById('transaction-hash-display');
-            transactionHashDisplay.style.display = 'block';
-            transactionHashDisplay.innerHTML = `<div class="spinner"></div> Attente du retour de l'écriture de la transaction BDag...`;
-        
-            // Définir un délai d'attente de 60 secondes
-            const timeout = setTimeout(() => {
-                transactionHashDisplay.textContent = "Délai d'attente dépassé. La blockchain met trop de temps à répondre.";
-                console.error("Délai d'attente dépassé.");
-            }, 60000); // 60 secondes
-        
-            try {
-                const contract = new ethers.Contract(contractAddress, contractABI, signer);
-                const tx = await contract.recordTransaction(code, comment);
-                console.log("Transaction envoyée :", tx.hash);
-        
-                // Annuler le délai d'attente si la blockchain répond
-                clearTimeout(timeout);
-        
-                // Attendre la confirmation de la transaction
-                const receipt = await tx.wait();
-                console.log("Transaction confirmée :", receipt);
-        
-                // Afficher le hash de la transaction dans le cadre noir
-                transactionHashDisplay.textContent = `Hash de la transaction : ${tx.hash}`;
-        
-                // Vérifier le statut de la transaction
-                if (receipt.status === 1) {
-                    console.log("Transaction réussie !");
-                    const explorerUrl = `https://explorer.blockdag.network/tx/${tx.hash}`;
-                    const linkContainer = document.getElementById('transaction-link');
-                    linkContainer.innerHTML = `<a href="${explorerUrl}" target="_blank">Voir la transaction sur BlockDAG Explorer</a>`;
-                } else {
-                    console.error("La transaction a échoué.");
-                    transactionHashDisplay.textContent = "La transaction a échoué. Voir la console pour plus de détails.";
+            // Fonction pour initialiser le provider et le signer
+            async function initializeProvider() {
+                if (typeof window.ethereum === "undefined") {
+                    console.error("MetaMask n'est pas installé.");    
+                    document.querySelectorAll('button').forEach(button => button.disabled = true);
+                    return null; // Retourne null si MetaMask n'est pas installé
                 }
-            } catch (error) {
-                // Annuler le délai d'attente en cas d'erreur
-                clearTimeout(timeout);
-        
-                console.error("Erreur lors de l'envoi de la transaction :", error);
-                transactionHashDisplay.textContent = `Erreur : ${error.message || "Une erreur s'est produite lors de l'envoi de la transaction."}`;
-            }
-        }
-        
-        // Étape 4 : Afficher un lien vers BDAG Scan
-        function showTransactionLink() {
-            const transactionHash = document.getElementById('transaction-hash-display').textContent.split(': ')[1];
-            const linkContainer = document.getElementById('transaction-link');
-            linkContainer.innerHTML = `<a href="https://bdagscan.com/txn/${transactionHash}" target="_blank">Voir la transaction sur BDAG Scan</a>`;
-        }
 
-        // Étape 5 : Visualisation des données stockées
-        async function fetchTransactionData() {
-            const transactionHashDisplay = document.getElementById('transaction-hash-display');
-            const transactionHash = transactionHashDisplay.textContent.split(': ')[1]; // Récupérer le hash de la transaction
-        
-            if (!transactionHash) {
-                alert("Aucune transaction trouvée. Veuillez d'abord écrire une transaction sur la blockchain.");
-                return;
-            }
-        
-            // Afficher un message d'attente
-            const transactionDataDisplay = document.getElementById('transaction-data-display');
-            transactionDataDisplay.style.display = 'block';
-            transactionDataDisplay.innerHTML = `<div class="spinner"></div> Requête envoyée à BDAG...`;
-        
-            // Définir un délai d'attente de 60 secondes
-            const timeout = setTimeout(() => {
-                transactionDataDisplay.textContent = "Délai d'attente dépassé. La blockchain met trop de temps à répondre.";
-                console.error("Délai d'attente dépassé.");
-            }, 60000); // 60 secondes
-        
-            try {
-                // Initialiser le provider
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-        
-                // Récupérer la transaction à partir de son hash
-                const transaction = await provider.getTransaction(transactionHash);
-        
-                // Récupérer les logs de la transaction
-                const receipt = await provider.getTransactionReceipt(transactionHash);
-        
-                // Décoder les logs pour obtenir les données de la transaction
-                const contract = new ethers.Contract(contractAddress, contractABI, provider);
-                const decodedLogs = contract.interface.parseLog(receipt.logs[0]);
-        
-                // Extraire les données de la transaction
-                const uniqueCode = decodedLogs.args.uniqueCode;
-                const comment = decodedLogs.args.comment;
-                const sender = decodedLogs.args.sender;
-                const timestamp = new Date(decodedLogs.args.timestamp * 1000).toLocaleString(); // Convertir le timestamp en date lisible
-        
-                // Annuler le délai d'attente si la blockchain répond
-                clearTimeout(timeout);
-        
-                // Vérifier que les éléments existent avant de les mettre à jour
-                const displayUniqueCode = document.getElementById('display-unique-code');
-                const displayComment = document.getElementById('display-comment');
-                const displaySender = document.getElementById('display-sender');
-                const displayTimestamp = document.getElementById('display-timestamp');
-                const explorerLink = document.getElementById('explorer-link');
-        
-                if (displayUniqueCode && displayComment && displaySender && displayTimestamp && explorerLink) {
-                    displayUniqueCode.textContent = uniqueCode;
-                    displayComment.textContent = comment;
-                    displaySender.textContent = sender;
-                    displayTimestamp.textContent = timestamp;
-        
-                    // Afficher le lien vers BDAG Scan
-                    const explorerUrl = `https://bdagscan.com/txn/${transactionHash}`;
-                    explorerLink.href = explorerUrl;
-                    explorerLink.textContent = "Voir la transaction sur BDAG Scan";
-        
-                    // Afficher le conteneur
-                    transactionDataDisplay.style.display = 'block';
-                } else {
-                    console.error("Un ou plusieurs éléments HTML sont manquants.");
-                    transactionDataDisplay.textContent = "Erreur : Impossible de trouver les éléments pour afficher les données.";
+                try {
+                    // Demander à l'utilisateur de se connecter à MetaMask
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                    // Initialiser le provider et le signer
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    const signer = provider.getSigner();
+                    console.log("Provider et signer initialisés avec succès.");
+                    return { provider, signer }; // Retourne les objets provider et signer
+                } catch (error) {
+                    console.error("Erreur lors de l'initialisation du provider :", error);
+                    return null; // Retourne null en cas d'erreur
                 }
-            } catch (error) {
-                // Annuler le délai d'attente en cas d'erreur
-                clearTimeout(timeout);
-        
-                console.error("Erreur lors de la récupération des données de la transaction :", error);
-                transactionDataDisplay.textContent = `Erreur : ${error.message || "Une erreur s'est produite lors de la récupération des données de la transaction."}`;
             }
-        }
 
-        // Afficher un message d'attente
-        const transactionDataDisplay = document.getElementById('transaction-data-display');
-            transactionDataDisplay.style.display = 'block';
-            transactionDataDisplay.innerHTML = `<div class="spinner"></div> Requête envoyée à BDAG...`;
+            // Étape 1 : Générer un code unique
+            async function generateRandomCode() {
+                const display = document.getElementById('code-display');
+                display.style.display = 'block';
+                display.textContent = 'Génération en cours...';
 
-            // Définir un délai d'attente de 60 secondes
-            const timeout = setTimeout(() => {
-                transactionDataDisplay.textContent = "Délai d'attente dépassé. La blockchain met trop de temps à répondre.";
-                console.error("Délai d'attente dépassé.");
-            }, 60000); // 60 secondes
+                try {
+                    // Simulation d'une requête à Chainlink VRF
+                    const randomCode = Math.floor(Math.random() * 1_000_000_000).toString().padStart(9, '0');
+                    const uniqueCode = generateUniqueCode(randomCode); // Ajoute la date/heure
+                    display.textContent = `Code généré : ${uniqueCode}`;
 
-            try {
-                // Initialiser le provider
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    // Stocker le code pour l'utiliser dans la modale
+                    window.generatedCode = uniqueCode;
 
-                // Récupérer la transaction à partir de son hash
-                const transaction = await provider.getTransaction(transactionHash);
+                    // Afficher le bouton "Vérifier le code unique"
+                    document.getElementById('verify-button').style.display = 'inline-block';
+                } catch (error) {
+                    display.textContent = 'Erreur lors de la génération du code. Veuillez réessayer.';
+                    console.error('Erreur :', error);
+                }
+            }
 
-                // Récupérer les logs de la transaction
-                const receipt = await provider.getTransactionReceipt(transactionHash);
+            // Fonction pour générer un code unique avec date/heure
+            function generateUniqueCode(randomCode) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                return `${year}${month}${day}${hours}${minutes}${seconds}${randomCode}`;
+            }
 
-                // Décoder les logs pour obtenir les données de la transaction
-                const contract = new ethers.Contract(contractAddress, contractABI, provider);
-                const decodedLogs = contract.interface.parseLog(receipt.logs[0]);
+            // Étape 2 : Ouvrir la modale pour entrer le code et le commentaire
+            function openInputModal() {
+                const modal = document.getElementById('input-modal');
+                const codeInput = document.getElementById('user-code');
+                const commentInput = document.getElementById('user-comment');
 
-                // Extraire les données de la transaction
-                const uniqueCode = decodedLogs.args.uniqueCode;
-                const comment = decodedLogs.args.comment;
-                const sender = decodedLogs.args.sender;
-                const timestamp = new Date(decodedLogs.args.timestamp * 1000).toLocaleString(); // Convertir le timestamp en date lisible
+                // Pré-remplir le champ Code avec le code généré
+                if (window.generatedCode) {
+                    codeInput.value = window.generatedCode;
+                } else {
+                    codeInput.value = ''; // Si aucun code n'a été généré
+                }
 
-                // Annuler le délai d'attente si la blockchain répond
-                clearTimeout(timeout);
+                // Réinitialiser le champ Commentaire
+                commentInput.value = '';
 
-                // Afficher les données dans le conteneur
-                <div id="transaction-data-display" class="code-display" style="display: none; margin-top: 20px;">
-                    <p><strong>Code unique :</strong> <span id="display-unique-code"></span></p>
-                    <p><strong>Commentaire :</strong> <span id="display-comment"></span></p>
-                    <p><strong>Expéditeur :</strong> <span id="display-sender"></span></p>
-                    <p><strong>Timestamp :</strong> <span id="display-timestamp"></span></p>
-                    <!-- Lien vers BDAG Scan -->
-                    <p><a id="explorer-link" href="#" target="_blank">Voir la transaction sur BDAG Scan</a></p>
-                </div>
-                // Afficher le lien vers BDAG Scan
-                const explorerUrl = `https://bdagscan.com/txn/${transactionHash}`;
-                const explorerLink = document.getElementById('explorer-link');
-                explorerLink.href = explorerUrl;
-                explorerLink.textContent = "Voir la transaction sur BDAG Scan";
+                // Afficher la modale
+                modal.style.display = 'block';
+            }
 
-                // Afficher le conteneur
+            // Soumettre le code et le commentaire
+            function submitInput() {
+                const code = document.getElementById('user-code').value;
+                const comment = document.getElementById('user-comment').value;
+
+                if (!code || !comment) {
+                    alert("Veuillez entrer un code et un commentaire valides.");
+                    return;
+                }
+                // Fermer la modale
+                document.getElementById('input-modal').style.display = 'none';
+
+                // Afficher les données soumises dans le bandeau noir
+                const submittedData = document.getElementById('submitted-data');
+                const submittedCode = document.getElementById('submitted-code');
+                const submittedComment = document.getElementById('submitted-comment');
+
+                submittedCode.textContent = code;
+                submittedComment.textContent = comment;
+                submittedData.style.display = 'block';
+
+                // Afficher les données soumises dans la console (ou les traiter)
+                console.log('Code:', code, 'Commentaire:', comment);
+            }
+
+            // Adresse du contrat et ABI
+            const contractAddress = "0x3FDF14321C67A004e666f0beC1C0050C23227f9C";
+            const contractABI = [
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "internalType": "string",
+                            "name": "uniqueCode",
+                            "type": "string"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "string",
+                            "name": "comment",
+                            "type": "string"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "address",
+                            "name": "sender",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "uint256",
+                            "name": "timestamp",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "TransactionRecorded",
+                    "type": "event"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "index",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getTransaction",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "uniqueCode",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "comment",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "sender",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "timestamp",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "getTransactionCount",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "string",
+                            "name": "_uniqueCode",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "_comment",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "recordTransaction",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "transactions",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "uniqueCode",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "comment",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "sender",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "timestamp",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                }
+            ];
+
+            // Étape 3 : Écrire sur la blockchain
+            async function writeToBlockchain() {
+                const result = await initializeProvider();
+                if (!result) {
+                    console.error("Impossible d'initialiser le provider.");
+                    return;
+                }
+            
+                const { provider, signer } = result; // Destructure le résultat
+                const code = window.generatedCode; // Code généré
+                const comment = document.getElementById('user-comment').value; // Commentaire
+            
+                if (!code || !comment) {
+                    alert("Veuillez générer un code et entrer un commentaire.");
+                    return;
+                }
+            
+                // Afficher un message d'attente
+                const transactionHashDisplay = document.getElementById('transaction-hash-display');
+                transactionHashDisplay.style.display = 'block';
+                transactionHashDisplay.innerHTML = `<div class="spinner"></div> Attente du retour de l'écriture de la transaction BDag...`;
+            
+                // Définir un délai d'attente de 60 secondes
+                const timeout = setTimeout(() => {
+                    transactionHashDisplay.textContent = "Délai d'attente dépassé. La blockchain met trop de temps à répondre.";
+                    console.error("Délai d'attente dépassé.");
+                }, 60000); // 60 secondes
+            
+                try {
+                    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                    const tx = await contract.recordTransaction(code, comment);
+                    console.log("Transaction envoyée :", tx.hash);
+            
+                    // Annuler le délai d'attente si la blockchain répond
+                    clearTimeout(timeout);
+            
+                    // Attendre la confirmation de la transaction
+                    const receipt = await tx.wait();
+                    console.log("Transaction confirmée :", receipt);
+            
+                    // Afficher le hash de la transaction dans le cadre noir
+                    transactionHashDisplay.textContent = `Hash de la transaction : ${tx.hash}`;
+            
+                    // Vérifier le statut de la transaction
+                    if (receipt.status === 1) {
+                        console.log("Transaction réussie !");
+                        const explorerUrl = `https://explorer.blockdag.network/tx/${tx.hash}`;
+                        const linkContainer = document.getElementById('transaction-link');
+                        linkContainer.innerHTML = `<a href="${explorerUrl}" target="_blank">Voir la transaction sur BlockDAG Explorer</a>`;
+                    } else {
+                        console.error("La transaction a échoué.");
+                        transactionHashDisplay.textContent = "La transaction a échoué. Voir la console pour plus de détails.";
+                    }
+                } catch (error) {
+                    // Annuler le délai d'attente en cas d'erreur
+                    clearTimeout(timeout);
+            
+                    console.error("Erreur lors de l'envoi de la transaction :", error);
+                    transactionHashDisplay.textContent = `Erreur : ${error.message || "Une erreur s'est produite lors de l'envoi de la transaction."}`;
+                }
+            }
+            
+            // Étape 4 : Afficher un lien vers BDAG Scan
+            function showTransactionLink() {
+                const transactionHash = document.getElementById('transaction-hash-display').textContent.split(': ')[1];
+                const linkContainer = document.getElementById('transaction-link');
+                linkContainer.innerHTML = `<a href="https://bdagscan.com/txn/${transactionHash}" target="_blank">Voir la transaction sur BDAG Scan</a>`;
+            }
+
+            // Étape 5 : Visualisation des données stockées
+            async function fetchTransactionData() {
+                const transactionHashDisplay = document.getElementById('transaction-hash-display');
+                const transactionHash = transactionHashDisplay.textContent.split(': ')[1]; // Récupérer le hash de la transaction
+
+                if (!transactionHash) {
+                    alert("Aucune transaction trouvée. Veuillez d'abord écrire une transaction sur la blockchain.");
+                    return;
+                }
+
+                // Afficher un message d'attente
+                const transactionDataDisplay = document.getElementById('transaction-data-display');
                 transactionDataDisplay.style.display = 'block';
-            } catch (error) {
-                // Annuler le délai d'attente en cas d'erreur
-                clearTimeout(timeout);
+                transactionDataDisplay.innerHTML = `<div class="spinner"></div> Requête envoyée à BDAG...`;
 
-                console.error("Erreur lors de la récupération des données de la transaction :", error);
-                transactionDataDisplay.textContent = `Erreur : ${error.message || "Une erreur s'est produite lors de la récupération des données de la transaction."}`;
+                // Définir un délai d'attente de 60 secondes
+                const timeout = setTimeout(() => {
+                    transactionDataDisplay.textContent = "Délai d'attente dépassé. La blockchain met trop de temps à répondre.";
+                    console.error("Délai d'attente dépassé.");
+                }, 60000); // 60 secondes
+
+                try {
+                    // Initialiser le provider
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+                    // Récupérer la transaction à partir de son hash
+                    const transaction = await provider.getTransaction(transactionHash);
+
+                    // Récupérer les logs de la transaction
+                    const receipt = await provider.getTransactionReceipt(transactionHash);
+
+                    // Décoder les logs pour obtenir les données de la transaction
+                    const contract = new ethers.Contract(contractAddress, contractABI, provider);
+                    const decodedLogs = contract.interface.parseLog(receipt.logs[0]);
+
+                    // Extraire les données de la transaction
+                    const uniqueCode = decodedLogs.args.uniqueCode;
+                    const comment = decodedLogs.args.comment;
+                    const sender = decodedLogs.args.sender;
+                    const timestamp = new Date(decodedLogs.args.timestamp * 1000).toLocaleString(); // Convertir le timestamp en date lisible
+
+                    // Annuler le délai d'attente si la blockchain répond
+                    clearTimeout(timeout);
+
+                    // Vérifier que les éléments existent avant de les mettre à jour
+                    const displayUniqueCode = document.getElementById('display-unique-code');
+                    const displayComment = document.getElementById('display-comment');
+                    const displaySender = document.getElementById('display-sender');
+                    const displayTimestamp = document.getElementById('display-timestamp');
+                    const explorerLink = document.getElementById('explorer-link');
+
+                    if (displayUniqueCode && displayComment && displaySender && displayTimestamp && explorerLink) {
+                        displayUniqueCode.textContent = uniqueCode;
+                        displayComment.textContent = comment;
+                        displaySender.textContent = sender;
+                        displayTimestamp.textContent = timestamp;
+
+                        // Afficher le lien vers BDAG Scan
+                        const explorerUrl = `https://bdagscan.com/txn/${transactionHash}`;
+                        explorerLink.href = explorerUrl;
+                        explorerLink.textContent = "Voir la transaction sur BDAG Scan";
+
+                        // Afficher le conteneur
+                        transactionDataDisplay.style.display = 'block';
+                    } else {
+                        console.error("Un ou plusieurs éléments HTML sont manquants.");
+                        transactionDataDisplay.textContent = "Erreur : Impossible de trouver les éléments pour afficher les données.";
+                    }
+                } catch (error) {
+                    // Annuler le délai d'attente en cas d'erreur
+                    clearTimeout(timeout);
+
+                    console.error("Erreur lors de la récupération des données de la transaction :", error);
+                    transactionDataDisplay.textContent = `Erreur : ${error.message || "Une erreur s'est produite lors de la récupération des données de la transaction."}`;
+                }
             }
-        }
 
-        // Fonction pour ouvrir la fenêtre modale de vérification
-        function openVerifyModal() {
-            const modal = document.getElementById('verify-modal');
-            const verifyCode = document.getElementById('verify-code');
-            const verifyProof = document.getElementById('verify-proof');
-            const verifyResult = document.getElementById('verify-result');
+            // Fonction pour ouvrir la fenêtre modale de vérification
+            function openVerifyModal() {
+                const modal = document.getElementById('verify-modal');
+                const verifyCode = document.getElementById('verify-code');
+                const verifyProof = document.getElementById('verify-proof');
+                const verifyResult = document.getElementById('verify-result');
 
-            // Afficher le code généré
-            verifyCode.textContent = window.generatedCode;
+                // Afficher le code généré
+                verifyCode.textContent = window.generatedCode;
 
-            // Simuler une preuve cryptographique
-            const proof = "0x" + Math.random().toString(16).substring(2, 18); // Simulation de la preuve
-            verifyProof.textContent = proof;
+                // Simuler une preuve cryptographique
+                const proof = "0x" + Math.random().toString(16).substring(2, 18); // Simulation de la preuve
+                verifyProof.textContent = proof;
 
-            // Simuler la vérification de la preuve
-            const isValid = true; // Simulation de la validation
-            verifyResult.textContent = isValid ? "✅ Preuve valide (simulation)" : "❌ Preuve invalide";
-            verifyResult.style.color = isValid ? "green" : "red";
+                // Simuler la vérification de la preuve
+                const isValid = true; // Simulation de la validation
+                verifyResult.textContent = isValid ? "✅ Preuve valide (simulation)" : "❌ Preuve invalide";
+                verifyResult.style.color = isValid ? "green" : "red";
 
-            // Afficher la modale
-            modal.style.display = 'block';
-        }
+                // Afficher la modale
+                modal.style.display = 'block';
+            }
 
-        // Fonction pour fermer la fenêtre modale de vérification
-        function closeVerifyModal() {
-            document.getElementById('verify-modal').style.display = 'none';
-        }
+            // Fonction pour fermer la fenêtre modale de vérification
+            function closeVerifyModal() {
+                document.getElementById('verify-modal').style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
