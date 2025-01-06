@@ -541,14 +541,81 @@
         async function fetchTransactionData() {
             const transactionHashDisplay = document.getElementById('transaction-hash-display');
             const transactionHash = transactionHashDisplay.textContent.split(': ')[1]; // Récupérer le hash de la transaction
-
+        
             if (!transactionHash) {
                 alert("Aucune transaction trouvée. Veuillez d'abord écrire une transaction sur la blockchain.");
                 return;
             }
-
+        
             // Afficher un message d'attente
             const transactionDataDisplay = document.getElementById('transaction-data-display');
+            transactionDataDisplay.style.display = 'block';
+            transactionDataDisplay.innerHTML = `<div class="spinner"></div> Requête envoyée à BDAG...`;
+        
+            // Définir un délai d'attente de 60 secondes
+            const timeout = setTimeout(() => {
+                transactionDataDisplay.textContent = "Délai d'attente dépassé. La blockchain met trop de temps à répondre.";
+                console.error("Délai d'attente dépassé.");
+            }, 60000); // 60 secondes
+        
+            try {
+                // Initialiser le provider
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+        
+                // Récupérer la transaction à partir de son hash
+                const transaction = await provider.getTransaction(transactionHash);
+        
+                // Récupérer les logs de la transaction
+                const receipt = await provider.getTransactionReceipt(transactionHash);
+        
+                // Décoder les logs pour obtenir les données de la transaction
+                const contract = new ethers.Contract(contractAddress, contractABI, provider);
+                const decodedLogs = contract.interface.parseLog(receipt.logs[0]);
+        
+                // Extraire les données de la transaction
+                const uniqueCode = decodedLogs.args.uniqueCode;
+                const comment = decodedLogs.args.comment;
+                const sender = decodedLogs.args.sender;
+                const timestamp = new Date(decodedLogs.args.timestamp * 1000).toLocaleString(); // Convertir le timestamp en date lisible
+        
+                // Annuler le délai d'attente si la blockchain répond
+                clearTimeout(timeout);
+        
+                // Vérifier que les éléments existent avant de les mettre à jour
+                const displayUniqueCode = document.getElementById('display-unique-code');
+                const displayComment = document.getElementById('display-comment');
+                const displaySender = document.getElementById('display-sender');
+                const displayTimestamp = document.getElementById('display-timestamp');
+                const explorerLink = document.getElementById('explorer-link');
+        
+                if (displayUniqueCode && displayComment && displaySender && displayTimestamp && explorerLink) {
+                    displayUniqueCode.textContent = uniqueCode;
+                    displayComment.textContent = comment;
+                    displaySender.textContent = sender;
+                    displayTimestamp.textContent = timestamp;
+        
+                    // Afficher le lien vers BDAG Scan
+                    const explorerUrl = `https://bdagscan.com/txn/${transactionHash}`;
+                    explorerLink.href = explorerUrl;
+                    explorerLink.textContent = "Voir la transaction sur BDAG Scan";
+        
+                    // Afficher le conteneur
+                    transactionDataDisplay.style.display = 'block';
+                } else {
+                    console.error("Un ou plusieurs éléments HTML sont manquants.");
+                    transactionDataDisplay.textContent = "Erreur : Impossible de trouver les éléments pour afficher les données.";
+                }
+            } catch (error) {
+                // Annuler le délai d'attente en cas d'erreur
+                clearTimeout(timeout);
+        
+                console.error("Erreur lors de la récupération des données de la transaction :", error);
+                transactionDataDisplay.textContent = `Erreur : ${error.message || "Une erreur s'est produite lors de la récupération des données de la transaction."}`;
+            }
+        }
+
+        // Afficher un message d'attente
+        const transactionDataDisplay = document.getElementById('transaction-data-display');
             transactionDataDisplay.style.display = 'block';
             transactionDataDisplay.innerHTML = `<div class="spinner"></div> Requête envoyée à BDAG...`;
 
@@ -582,11 +649,14 @@
                 clearTimeout(timeout);
 
                 // Afficher les données dans le conteneur
-                document.getElementById('display-unique-code').textContent = uniqueCode;
-                document.getElementById('display-comment').textContent = comment;
-                document.getElementById('display-sender').textContent = sender;
-                document.getElementById('display-timestamp').textContent = timestamp;
-
+                <div id="transaction-data-display" class="code-display" style="display: none; margin-top: 20px;">
+                    <p><strong>Code unique :</strong> <span id="display-unique-code"></span></p>
+                    <p><strong>Commentaire :</strong> <span id="display-comment"></span></p>
+                    <p><strong>Expéditeur :</strong> <span id="display-sender"></span></p>
+                    <p><strong>Timestamp :</strong> <span id="display-timestamp"></span></p>
+                    <!-- Lien vers BDAG Scan -->
+                    <p><a id="explorer-link" href="#" target="_blank">Voir la transaction sur BDAG Scan</a></p>
+                </div>
                 // Afficher le lien vers BDAG Scan
                 const explorerUrl = `https://bdagscan.com/txn/${transactionHash}`;
                 const explorerLink = document.getElementById('explorer-link');
