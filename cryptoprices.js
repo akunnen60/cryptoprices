@@ -99,4 +99,4 @@ function updateBanner(prices) {
 
 // Charger les prix au démarrage et toutes les 10 secondes
 fetchCryptoPrices();
-setInterval(fetchCryptoPrices, 10000);
+setInterval(fetchCryptoPrices, 30000);
