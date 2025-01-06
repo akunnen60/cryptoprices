@@ -519,8 +519,8 @@
         function showTransactionLink() {
             const transactionHash = document.getElementById('transaction-hash-display').textContent.split(': ')[1];
             const linkContainer = document.getElementById('transaction-link');
-            linkContainer.innerHTML = `<a href="https://testnet.bdagscan.io/tx/${transactionHash}" target="_blank">Voir la transaction sur BDAG Scan</a>`;
-}
+            linkContainer.innerHTML = `<a href="https://bdagscan.com/txn/${transactionHash}" target="_blank">Voir la transaction sur BDAG Scan</a>`;
+        }
 
         // Fonction pour ouvrir la fenêtre modale de vérification
         function openVerifyModal() {
