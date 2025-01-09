@@ -7,7 +7,97 @@
     <!-- Ajouter ethers.js -->
     <script src="ethers.umd.min.js"></script>
     <style>
-        /* Styles CSS inchangés */
+        #crypto-banner {
+            text-align: center; /* Centrer le texte */
+            font-weight: bold; /* Texte en gras */
+            background-color: #FBFAF3;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            color: #333;
+            position: fixed; /* Bannière fixe en haut */
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000; /* S'assurer qu'elle est au-dessus du reste */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #FBFAF3;
+            color: #333;
+            padding-top: 60px; /* Pour éviter que la bannière ne chevauche le contenu */
+        }
+        header {
+            background: #4CAF50;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #503AA8;
+        }
+        button {
+            background-color: #503AA8;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .code-display {
+            background: #000;
+            color: #fff;
+            padding: 10px;
+            font-size: 18px;
+            margin-top: 10px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            background: #333;
+            color: #fff;
+        }
+        .green {
+            color: green;
+        }
+        .red {
+            color: red;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #503AA8;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -17,7 +107,100 @@
         <h1>Démo : Sécuriser une transaction avec Chainlink et Blockchain</h1>
     </header>
     <div class="container">
-        <!-- Contenu HTML inchangé -->
+        <!-- Introduction -->
+        <h2>Introduction</h2>
+        <p>
+            Découvrez comment utiliser la puissance de la blockchain et de Chainlink VRF pour
+            sécuriser des transactions de manière immuable et transparente.
+        </p>
+
+        <!-- Objectifs de la démonstration -->
+        <h2>Objectifs de la démonstration</h2>
+        <ol>
+            <li><strong>Génération d’un code aléatoire sécurisé :</strong> Utilisation de Chainlink VRF pour créer un code unique et vérifiable.</li>
+            <li><strong>Création d’une transaction immuable :</strong> Le code est inscrit sur une blockchain publique, garantissant transparence et intégrité.</li>
+            <li><strong>Démonstration pratique :</strong> Explorez un cas réel d'application de ces technologies.</li>
+        </ol>
+
+        <!-- Étape 1 : Générer un code unique avec Chainlink VRF -->
+        <h2>Étape 1 : Générer un code unique</h2>
+        <p>
+            Utilisez Chainlink VRF pour générer un code aléatoire sécurisé et vérifiable. Ce code sera utilisé pour identifier de manière unique votre transaction.
+        </p>
+        <p>
+            <strong>Pourquoi utiliser Chainlink VRF ?</strong> Chainlink VRF (Verifiable Random Function) est une solution décentralisée pour générer des nombres aléatoires vérifiables. Contrairement à un générateur aléatoire classique, Chainlink VRF fournit une preuve cryptographique que le nombre généré est vraiment aléatoire et n'a pas été manipulé. Cela garantit :
+        </p>
+        <ul>
+            <li><strong>Transparence :</strong> Le processus de génération est enregistré sur la blockchain et peut être vérifié par n'importe qui.</li>
+            <li><strong>Sécurité :</strong> Le nombre aléatoire est protégé contre toute manipulation grâce à des techniques cryptographiques avancées.</li>
+            <li><strong>Décentralisation :</strong> Aucune entité centrale ne contrôle la génération du nombre, ce qui renforce la confiance.</li>
+        </ul>
+        <button onclick="generateRandomCode()">Générer un code</button>
+        <button id="verify-button" style="display: none; background-color: blue; color: white;" onclick="openVerifyModal()">Vérifier le code unique</button>
+        <p style="font-size: 12px; color: #666; margin-top: 5px;">
+            La vérification est simulée. Pour une vérification réelle et un appel réel à Chainlink, il y aurait un coût de jeton Chainlink à payer. 
+        </p>
+        <div id="code-display" class="code-display">Votre code généré apparaîtra ici...</div>
+
+        <!-- Étape 2 : Demander un code et un commentaire -->
+        <h2>Étape 2 : Entrer un code et un commentaire</h2>
+        <p>
+            Entrez le code généré et un commentaire pour créer une transaction. Ces informations seront enregistrées sur la blockchain.
+        </p>
+        <button onclick="openInputModal()">Entrer le code et le commentaire</button>
+        <div id="submitted-data" class="code-display" style="display: none;">
+            Code soumis : <span id="submitted-code"></span><br>
+            Commentaire : <span id="submitted-comment"></span>
+        </div>
+
+        <!-- Étape 3 : Écrire une transaction sur la blockchain -->
+        <h2>Étape 3 : Écrire une transaction sur la blockchain</h2>
+        <p>
+            Enregistrez le code et le commentaire sur la blockchain BDAG (testnet). Cette étape garantit l'immuabilité et la transparence de la transaction.
+        </p>
+        <button onclick="writeToBlockchain()">Écrire sur la blockchain</button>
+        <div id="transaction-hash-display" class="code-display" style="display: none; margin-top: 20px;">
+            Code de la transaction: <span id="submitted-code"></span><br>
+            Résultat de la blockchain Bdag: <span id="submitted-comment"></span>
+        </div>
+
+        <!-- Étape 4 : Afficher un lien vers BDAG Scan -->
+        <h2>Étape 4 : Voir la transaction sur BDAG Scan</h2>
+        <p>
+            Consultez la transaction enregistrée sur BDAG Scan. Vous pouvez vérifier les détails de la transaction, y compris le code et le commentaire.
+        </p>
+        <button onclick="showTransactionLink()">Voir la transaction</button>
+        <div id="transaction-link" style="margin-top: 20px;"></div>
+
+        <!-- Étape 5 : Visualisation des données stockées -->
+        <h2>Étape 5 : Visualisation des données stockées</h2>
+        <p>
+            Vous pouvez maintenant récupérer et visualiser les détails de la transaction enregistrée sur la blockchain BDAG.
+        </p>
+        <button onclick="fetchTransactionData()">Visualiser les données de la transaction</button>
+        <div id="transaction-data-display" class="code-display" style="display: none; margin-top: 20px;">
+            <p><strong>Code unique :</strong> <span id="display-unique-code"></span></p>
+            <p><strong>Commentaire :</strong> <span id="display-comment"></span></p>
+            <p><strong>Expéditeur :</strong> <span id="display-sender"></span></p>
+            <p><strong>Timestamp :</strong> <span id="display-timestamp"></span></p>
+            <!-- Lien vers BDAG Scan -->
+            <p><a id="explorer-link" href="#" target="_blank">Voir la transaction sur BDAG Scan</a></p>
+        </div>
+
+        <!-- Pourquoi ce projet est important ? -->
+        <h2>Pourquoi ce projet est important ?</h2>
+        <p>
+            La blockchain offre une solution pour sécuriser les transactions, garantir leur immuabilité, et créer des systèmes transparents. 
+            Ce projet démontre comment combiner les technologies de Chainlink et des blockchains pour répondre à des besoins variés.
+        </p>
+
+        <!-- Technologies utilisées -->
+        <h2>Technologies utilisées</h2>
+        <ul>
+            <li><strong>Chainlink VRF :</strong> Génération de codes aléatoires sécurisés et vérifiables.</li>
+            <li><strong>Blockchain publique :</strong> Inscription des transactions sur une blockchain comme Polygon ou Ethereum.</li>
+            <li><strong>AWS :</strong> Hébergement sécurisé de cette démonstration en ligne.</li>
+        </ul>
     </div>
 
     <footer>
