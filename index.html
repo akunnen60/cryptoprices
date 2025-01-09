@@ -572,58 +572,76 @@
                 alert("Aucune donnée trouvée. Veuillez d'abord générer un code, soumettre un commentaire et écrire une transaction sur la blockchain.");
                 return;
             }
-
+        
+            // Afficher un message d'attente
             const transactionDataDisplay = document.getElementById('transaction-data-display');
             transactionDataDisplay.style.display = 'block';
             transactionDataDisplay.innerHTML = `<div class="spinner"></div> Requête envoyée à BDAG...`;
-
+        
+            // Définir un délai d'attente de 60 secondes
             const timeout = setTimeout(() => {
                 transactionDataDisplay.textContent = "Délai d'attente dépassé. La blockchain met trop de temps à répondre.";
                 console.error("Délai d'attente dépassé.");
             }, 60000);
-
+        
             try {
+                // Initialiser le provider
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
+        
+                // Récupérer la transaction à partir de son hash
                 const transaction = await provider.getTransaction(transactionHash);
+        
+                // Récupérer les logs de la transaction
                 const receipt = await provider.getTransactionReceipt(transactionHash);
+                console.log("Logs de la transaction :", receipt.logs);
+        
+                // Décoder les logs pour obtenir les données de la transaction
                 const contract = new ethers.Contract(contractAddress, contractABI, provider);
                 const decodedLogs = contract.interface.parseLog(receipt.logs[0]);
-
+                console.log("Logs décodés :", decodedLogs);
+        
+                // Extraire les données de la transaction
                 const uniqueCode = decodedLogs.args.uniqueCode;
                 const comment = decodedLogs.args.comment;
                 const sender = decodedLogs.args.sender;
                 const timestamp = new Date(decodedLogs.args.timestamp * 1000).toLocaleString();
-
+        
+                // Annuler le délai d'attente si la blockchain répond
                 clearTimeout(timeout);
-
+        
+                // Vérifier que les éléments existent avant de les mettre à jour
                 const displayUniqueCode = document.getElementById('display-unique-code');
                 const displayComment = document.getElementById('display-comment');
                 const displaySender = document.getElementById('display-sender');
                 const displayTimestamp = document.getElementById('display-timestamp');
                 const explorerLink = document.getElementById('explorer-link');
-
+        
                 if (displayUniqueCode && displayComment && displaySender && displayTimestamp && explorerLink) {
-                    displayUniqueCode.textContent = generatedCode; // Utiliser la variable globale
-                    displayComment.textContent = submittedComment; // Utiliser la variable globale
+                    displayUniqueCode.textContent = uniqueCode;
+                    displayComment.textContent = comment;
                     displaySender.textContent = sender;
                     displayTimestamp.textContent = timestamp;
-
+        
+                    // Afficher le lien vers BDAG Scan
                     const explorerUrl = `https://bdagscan.com/txn/${transactionHash}`;
                     explorerLink.href = explorerUrl;
                     explorerLink.textContent = "Voir la transaction sur BDAG Scan";
-
+        
+                    // Afficher le conteneur
                     transactionDataDisplay.style.display = 'block';
                 } else {
                     console.error("Un ou plusieurs éléments HTML sont manquants.");
                     transactionDataDisplay.textContent = "Erreur : Impossible de trouver les éléments pour afficher les données.";
                 }
             } catch (error) {
+                // Annuler le délai d'attente en cas d'erreur
                 clearTimeout(timeout);
+        
                 console.error("Erreur lors de la récupération des données de la transaction :", error);
                 transactionDataDisplay.textContent = `Erreur : ${error.message || "Une erreur s'est produite lors de la récupération des données de la transaction."}`;
             }
         }
-
+        
         // Fonction pour ouvrir la fenêtre modale de vérification
         function openVerifyModal() {
             const modal = document.getElementById('verify-modal');
